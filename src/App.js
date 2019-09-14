@@ -1,26 +1,45 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+
+import { formatDistanceStrict, format } from 'date-fns';
+
+import ProgressBar from './components/ProgressBar';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const [progress, setProgress] = useState(0);
+	const [label, setLabel] = useState('');
+
+	function countTime() {
+		const d = new Date();
+
+		const distanceComecoDoAno2FimDoAno = parseInt(
+			formatDistanceStrict(
+				new Date(d.getFullYear(), 0, 1, 0, 0, 0),
+				new Date(d.getFullYear(), 11, 31, 23, 59, 59),
+				{
+					unit: 'second'
+				}
+			)
+		);
+		const distanceHoje2FimDoAno = parseInt(
+			formatDistanceStrict(new Date(), new Date(d.getFullYear(), 11, 31, 23, 59, 59), {
+				unit: 'second'
+			})
+		);
+
+		const progress =
+			((distanceComecoDoAno2FimDoAno - distanceHoje2FimDoAno) /
+				distanceComecoDoAno2FimDoAno) *
+			100;
+
+		const label = `${format(d, "dd'/'MM'/'yy '|' HH:mm:ss")} | ${progress.toFixed(2)}%`;
+
+		setLabel(label);
+		setProgress(progress);
+	}
+
+	setInterval(countTime, 1000);
+
+	return <ProgressBar label={label} progress={progress} />;
 }
 
 export default App;
